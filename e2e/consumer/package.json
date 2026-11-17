@@ -1,0 +1,27 @@
+{
+  "name": "tour-guide-e2e-consumer",
+  "private": true,
+  "description": "A throwaway end-user project. e2e/run.mjs copies it to a temp folder, points @xkid1/tour-guide at the packed tarball and installs it like a real app would.",
+  "type": "module",
+  "dependencies": {
+    "@xkid1/tour-guide": "file:__TARBALL__",
+    "@angular/common": "^22.0.0",
+    "@angular/compiler": "^22.0.0",
+    "@angular/core": "^22.0.0",
+    "@angular/platform-browser": "^22.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "rxjs": "^7.8.0",
+    "svelte": "^5.0.0",
+    "tslib": "^2.6.0",
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "@happy-dom/global-registrator": "^21.0.0",
+    "@types/react": "^19.0.0",
+    "typescript": "^6.0.0",
+    "typescript-5": "npm:typescript@~5.9.0",
+    "typescript-7": "npm:typescript@^7.0.0",
+    "vite": "^8.0.0"
+  }
+}

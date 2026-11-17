@@ -1,0 +1,14 @@
+{
+  // Editor only: resolves the package to the repo's dist/ so consumer.ts is readable in an IDE
+  // (run `yarn build` first). The e2e run uses tsconfig.{bundler,node16,nodenext}.json against
+  // the installed tarball instead.
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@xkid1/tour-guide": ["../../../dist/index.d.ts"],
+      "@xkid1/tour-guide/*": ["../../../dist/apps/*/index.d.ts"]
+    }
+  }
+}

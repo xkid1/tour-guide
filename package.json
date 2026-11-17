@@ -1,0 +1,185 @@
+{
+  "name": "@xkid1/tour-guide",
+  "version": "0.1.0",
+  "description": "Zero-dependency, accessible, responsive product-tour Web Component (<tour-guide>) for vanilla JS, React, Vue, Svelte, Angular, Electron and WebViews.",
+  "keywords": [
+    "tour",
+    "tour-guide",
+    "product-tour",
+    "onboarding",
+    "walkthrough",
+    "web-component",
+    "custom-element",
+    "spotlight",
+    "react",
+    "vue",
+    "svelte",
+    "angular",
+    "electron",
+    "typescript",
+    "zero-dependency"
+  ],
+  "homepage": "https://github.com/xkid1/tour-guide#readme",
+  "bugs": "https://github.com/xkid1/tour-guide/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xkid1/tour-guide.git"
+  },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/xkid1"
+    },
+    {
+      "type": "buymeacoffee",
+      "url": "https://buymeacoffee.com/elmeralluaj"
+    }
+  ],
+  "license": "MIT",
+  "author": "xkid1",
+  "type": "module",
+  "sideEffects": [
+    "./dist/apps/browser/index.js",
+    "./dist/apps/electron/index.js",
+    "./dist/browser/*.js"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "unpkg": "./dist/browser/tour-guide.iife.js",
+  "jsdelivr": "./dist/browser/tour-guide.iife.js",
+  "customElements": "./dist/custom-elements.json",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./browser": {
+      "types": "./dist/apps/browser/index.d.ts",
+      "import": "./dist/apps/browser/index.js",
+      "default": "./dist/apps/browser/index.js"
+    },
+    "./react": {
+      "types": "./dist/apps/react/index.d.ts",
+      "import": "./dist/apps/react/index.js",
+      "default": "./dist/apps/react/index.js"
+    },
+    "./vue": {
+      "types": "./dist/apps/vue/index.d.ts",
+      "import": "./dist/apps/vue/index.js",
+      "default": "./dist/apps/vue/index.js"
+    },
+    "./svelte": {
+      "types": "./dist/apps/svelte/index.d.ts",
+      "import": "./dist/apps/svelte/index.js",
+      "default": "./dist/apps/svelte/index.js"
+    },
+    "./angular": {
+      "types": "./dist/apps/angular/index.d.ts",
+      "import": "./dist/apps/angular/index.js",
+      "default": "./dist/apps/angular/index.js"
+    },
+    "./electron": {
+      "types": "./dist/apps/electron/index.d.ts",
+      "import": "./dist/apps/electron/index.js",
+      "default": "./dist/apps/electron/index.js"
+    },
+    "./resume": {
+      "types": "./dist/apps/resume/index.d.ts",
+      "import": "./dist/apps/resume/index.js",
+      "default": "./dist/apps/resume/index.js"
+    },
+    "./android": {
+      "types": "./dist/apps/android/index.d.ts",
+      "import": "./dist/apps/android/index.js",
+      "default": "./dist/apps/android/index.js"
+    },
+    "./iife": "./dist/browser/tour-guide.iife.js",
+    "./custom-elements.json": "./dist/custom-elements.json",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "packageManager": "yarn@4.18.0",
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=18.0.0",
+      "onFail": "warn"
+    },
+    "packageManager": [
+      {
+        "name": "npm"
+      },
+      {
+        "name": "yarn",
+        "version": ">=4.0.0"
+      }
+    ]
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "yarn clean && yarn build:js && yarn build:types && yarn build:aliases && yarn build:browser && yarn build:manifest",
+    "build:js": "swc src -d dist --config-file swc.config.json --strip-leading-paths --ignore \"**/*.test.ts\",\"**/*.spec.ts\",\"**/*.md\"",
+    "build:types": "tsc -p tsconfig.build.json",
+    "build:aliases": "node scripts/resolve-aliases.mjs dist",
+    "build:browser": "jiti scripts/build-browser.ts",
+    "build:manifest": "node scripts/custom-elements-manifest.mjs",
+    "clean": "node -e \"require('node:fs').rmSync('dist',{recursive:true,force:true})\"",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "bench": "vitest bench --run",
+    "bench:json": "vitest bench --run --reporter=default --reporter=./bench/json-reporter.ts",
+    "bench:compare": "node bench/compare.mjs",
+    "size": "node bench/size.mjs",
+    "check:deps": "node scripts/check-zero-deps.mjs",
+    "e2e": "node e2e/run.mjs",
+    "e2e:browsers": "node e2e/run.mjs --browsers chromium,firefox,webkit --electron",
+    "check": "yarn check:deps && yarn format:check && yarn lint && yarn typecheck && yarn coverage && yarn build && yarn size",
+    "demo": "vite",
+    "prepack": "yarn build"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@swc/cli": "^0.8.2",
+    "@swc/core": "^1.16.22",
+    "@types/node": "^26.6.6",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@vitest/coverage-v8": "^5.1.0",
+    "@vitest/eslint-plugin": "^1.6.28",
+    "eslint": "^10.14.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-import-x": "^4.18.0",
+    "eslint-plugin-n": "^18.5.0",
+    "eslint-plugin-security": "^4.2.1",
+    "globals": "^17.14.0",
+    "happy-dom": "^21.0.4",
+    "jiti": "^2.7.0",
+    "prettier": "^3.9.10",
+    "react": "^19",
+    "react-dom": "^19",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.72.1",
+    "vite": "^8.3.6",
+    "vitest": "^5.1.0",
+    "vue": "^3"
+  }
+}

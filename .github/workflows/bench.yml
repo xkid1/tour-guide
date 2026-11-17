@@ -1,0 +1,103 @@
+name: Benchmarks
+
+# Bundle-size budget (blocking) and a benchmark comparison against the PR's base
+# (informational, in the job summary). Base and head run on the same runner, one after the
+# other, with the head's bench/ folder, so only the library code differs. See bench/README.md.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  changes:
+    name: Changes
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.changes.outputs.code }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: changes
+        uses: ./.github/actions/changes
+
+  size:
+    name: Size
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: yarn build
+      - name: Bundle-size budget
+        run: |
+          {
+            echo '### Bundle size'
+            echo
+            node bench/size.mjs
+          } | tee -a "$GITHUB_STEP_SUMMARY"
+          exit "${PIPESTATUS[0]}"
+
+  bench:
+    name: Bench
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    env:
+      BENCH_TIME: '1000'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: ./.github/actions/setup
+
+      - name: Benchmark head
+        env:
+          BENCH_JSON: ${{ runner.temp }}/bench/head.json
+        run: yarn bench:json
+
+      - name: Benchmark base
+        if: github.event_name == 'pull_request'
+        id: base
+        # The base may predate an API the head's benchmarks use; then there is just no diff.
+        continue-on-error: true
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          BENCH_JSON: ${{ runner.temp }}/bench/base.json
+        run: |
+          git worktree add "$RUNNER_TEMP/base" "$BASE_SHA"
+          rm -rf "$RUNNER_TEMP/base/bench"
+          cp -r bench "$RUNNER_TEMP/base/bench"
+          cd "$RUNNER_TEMP/base"
+          yarn install --immutable
+          yarn vitest bench --run --reporter=default --reporter=./bench/json-reporter.ts
+
+      - name: Summary
+        env:
+          HEAD_JSON: ${{ runner.temp }}/bench/head.json
+          BASE_JSON: ${{ runner.temp }}/bench/base.json
+          BASE_OK: ${{ steps.base.outcome == 'success' }}
+        run: |
+          if [ "$BASE_OK" = true ] && [ -f "$BASE_JSON" ]; then
+            node bench/compare.mjs "$BASE_JSON" "$HEAD_JSON" >> "$GITHUB_STEP_SUMMARY"
+          else
+            node bench/compare.mjs "$HEAD_JSON" "$HEAD_JSON" >> "$GITHUB_STEP_SUMMARY"
+            echo '_No base run to compare against; head numbers only._' >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bench-results
+          path: ${{ runner.temp }}/bench/*.json
+          retention-days: 30

@@ -1,0 +1,66 @@
+name: Accessibility issue
+description: Something doesn't work with a keyboard, screen reader, zoom, high contrast or reduced motion.
+title: '[A11y]: '
+labels:
+  - accessibility
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks! Accessibility problems are treated as bugs. See [ACCESSIBILITY.md](https://github.com/xkid1/tour-guide/blob/main/ACCESSIBILITY.md) for what the component aims to support and the known limitations.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: What were you trying to do, and what happened instead?
+    validations:
+      required: true
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      multiple: true
+      options:
+        - Keyboard navigation / focus
+        - Screen reader announcements
+        - Colour contrast
+        - Zoom / reflow / text size
+        - Reduced motion
+        - High contrast / forced colours
+        - Touch targets / mobile
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: at
+    attributes:
+      label: Assistive technology and version
+      placeholder: NVDA 2024.4, VoiceOver (macOS 15), TalkBack 15, keyboard only…
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and OS
+      placeholder: Firefox 133 on Windows 11
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Package version
+      placeholder: 0.1.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction
+      description: A link, or the tour's steps and options. Does it happen in the demo (`yarn demo`)?
+      render: html

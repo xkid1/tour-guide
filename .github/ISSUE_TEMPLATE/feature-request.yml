@@ -1,0 +1,61 @@
+name: Feature request
+description: Suggest an improvement or a new capability.
+title: '[Feature]: '
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The package has zero runtime dependencies and a small bundle, and its options, attributes,
+        events, CSS variables and parts are public API. Proposals that keep it small (or that
+        fit in their own opt-in entry point, like `/resume`) are the easiest to accept.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      multiple: true
+      options:
+        - Steps, navigation and hooks
+        - Positioning and mobile layout
+        - Styling, themes and animation
+        - Accessibility
+        - Framework adapter (React, Vue, Svelte, Angular)
+        - New framework or platform integration
+        - Native WebView bridge
+        - TypeScript types
+        - Documentation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What are you trying to build, and what stops you today?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: The option, attribute, event or API you'd like. A short usage example helps a lot.
+      render: typescript
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Workarounds you use today (hooks, events, CSS), or other libraries that solve this.
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I'd be willing to open a pull request for this.

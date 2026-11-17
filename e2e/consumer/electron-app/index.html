@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <!-- 'unsafe-inline' for styles only until applyStyles() stops appending an inline <style>
+         (see the strict CSP todo in browser/real-browsers.test.mjs). -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'"
+    />
+    <title>Electron renderer</title>
+    <link
+      rel="stylesheet"
+      href="../browser/page.css"
+    />
+  </head>
+  <body>
+    <main>
+      <button id="opener">Take the tour</button>
+      <div><button id="anchor">Anchor</button></div>
+      <div><button id="far">Far below</button></div>
+    </main>
+    <!-- No bundler: the IIFE from the installed package, loaded over file:// -->
+    <script src="../node_modules/@xkid1/tour-guide/dist/browser/tour-guide.iife.js"></script>
+    <script src="../browser/steps.js"></script>
+    <script src="./renderer.js"></script>
+  </body>
+</html>
