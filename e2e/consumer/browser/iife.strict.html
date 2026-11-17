@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1"
+    />
+    <title>IIFE under a strict CSP</title>
+    <link
+      rel="stylesheet"
+      href="/browser/page.css"
+    />
+  </head>
+  <body>
+    <main>
+      <button id="opener">Take the tour</button>
+      <div><button id="anchor">Anchor</button></div>
+      <div><button id="far">Far below</button></div>
+    </main>
+    <!-- Exactly what the README tells CDN / no-bundler users to do. -->
+    <script src="/node_modules/@xkid1/tour-guide/dist/browser/tour-guide.iife.js"></script>
+    <script src="/browser/iife-app.js"></script>
+  </body>
+</html>

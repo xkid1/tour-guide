@@ -1,0 +1,67 @@
+# Labels pull requests from the files they change (pr-labeler.yml). The labels also
+# group the generated release notes (release.yml).
+
+'source':
+  - changed-files:
+      - all-globs-to-any-file:
+          - 'src/**/*.{ts,tsx}'
+          - '!src/**/*.test.ts'
+
+'adapters':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/apps/**'
+
+'styles':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/libs/styles/**'
+
+'tests':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'src/**/*.test.ts'
+          - 'tests/**'
+
+'e2e':
+  - changed-files:
+      - any-glob-to-any-file: 'e2e/**'
+
+'demo':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'demo/**'
+          - 'docs/**'
+
+'benchmarks':
+  - changed-files:
+      - any-glob-to-any-file: 'bench/**'
+
+'ci':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/workflows/**'
+          - '.github/actions/**'
+          - '.github/dependabot.yml'
+          - '.github/labeler.yml'
+          - '.github/release.yml'
+
+'documentation':
+  - changed-files:
+      - any-glob-to-any-file: '**/*.md'
+
+'tooling':
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'package.json'
+          - 'yarn.lock'
+          - 'tsconfig*.json'
+          - '.swcrc'
+          - 'swc.config.json'
+          - '.yarnrc.yml'
+          - '.nvmrc'
+          - '.prettierrc.ts'
+          - 'eslint.config.js'
+          - 'vite.config.ts'
+          - 'vitest.config.ts'
+          - 'scripts/**'

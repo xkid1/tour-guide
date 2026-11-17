@@ -1,0 +1,18 @@
+body {
+  margin: 0;
+  font:
+    16px/1.4 system-ui,
+    sans-serif;
+}
+main {
+  padding: 24px;
+}
+#anchor {
+  margin: 120px 0 0 200px;
+  padding: 8px 16px;
+}
+#far {
+  margin-top: 2000px;
+  margin-left: 40px;
+  padding: 8px 16px;
+}

@@ -1,0 +1,193 @@
+name: End-user tests
+
+# Packs the package as `npm publish` would and tests the tarball in a fresh consumer
+# project, through the public `exports` map only: SSR imports, TypeScript 5.9/6/7 in
+# bundler/node16/nodenext modes, vanilla JS, the IIFE bundle, Electron, Android/iOS/React
+# Native WebView bridges, React 18/19, Vue 3, Svelte 4/5, Angular, Vite builds, real
+# Chromium/Firefox/WebKit and a real Electron app. See e2e/README.md.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  # publish.yml runs this suite on the release tag, then publishes the tested tarball.
+  workflow_call:
+    inputs:
+      ref:
+        description: Git ref (tag) to pack and test
+        required: true
+        type: string
+    outputs:
+      tarball:
+        description: File name of the tested tarball in the "package-tarball" artifact
+        value: ${{ jobs.pack.outputs.tarball }}
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  COREPACK_ENABLE_DOWNLOAD_PROMPT: '0'
+
+jobs:
+  # Skips the suite when only *.md / *.yml files changed. Always runs for
+  # publish.yml (tag push), manual runs and other events; see the action.
+  changes:
+    name: Changes
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.changes.outputs.code }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: changes
+        uses: ./.github/actions/changes
+
+  pack:
+    name: Pack tarball
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    outputs:
+      tarball: ${{ steps.pack.outputs.tarball }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+      - uses: ./.github/actions/setup
+      - name: npm pack (runs prepack → yarn build)
+        id: pack
+        run: |
+          mkdir -p "$RUNNER_TEMP/pack"
+          TARBALL=$(npm pack --pack-destination "$RUNNER_TEMP/pack" --loglevel=error | tail -1)
+          echo "tarball=$TARBALL" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: package-tarball
+          path: ${{ runner.temp }}/pack/*.tgz
+          retention-days: 7
+
+  # happy-dom + real frameworks. Suites that need a newer Node skip themselves
+  # (Node 18: exports, SSR and types only; Angular 22 needs Node ^22.22/^24.15/>=26).
+  matrix:
+    name: ${{ matrix.name || format('Node {0} ({1})', matrix.node, matrix.pm) }}
+    needs: pack
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node: [18, 20, 22, 24, 26]
+        pm: [npm]
+        include:
+          - node: 24
+            pm: pnpm
+          - name: React 18 (Node 24)
+            node: 24
+            pm: npm
+            deps: --dep react@^18.3.0 --dep react-dom@^18.3.0
+          - name: Svelte 4 (Node 24)
+            node: 24
+            pm: npm
+            deps: --dep svelte@^4.2.0
+    steps:
+      # Only the e2e/ folder is needed; the package itself comes from the tarball.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+          sparse-checkout: e2e
+      - uses: actions/download-artifact@v4
+        with:
+          name: package-tarball
+          path: ${{ runner.temp }}/pack
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: Enable pnpm
+        if: matrix.pm == 'pnpm'
+        run: corepack enable pnpm
+      - name: Run end-user suite
+        env:
+          # From Node 22 on every default suite must run, so a skip can't hide a failure.
+          E2E_FAIL_ON_SKIP: ${{ matrix.node >= 22 && '1' || '0' }}
+          TARBALL: ${{ runner.temp }}/pack/${{ needs.pack.outputs.tarball }}
+          PM: ${{ matrix.pm }}
+          DEPS: ${{ matrix.deps }}
+        # DEPS is intentionally unquoted: it holds zero or more `--dep name@range` flags.
+        run: node e2e/run.mjs --pm "$PM" --tarball "$TARBALL" $DEPS
+
+  # Real engines via Playwright: layout, scrolling, focus trap, CSP, phone viewport.
+  browsers:
+    name: Real browsers
+    needs: pack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+          sparse-checkout: e2e
+      - uses: actions/download-artifact@v4
+        with:
+          name: package-tarball
+          path: ${{ runner.temp }}/pack
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Chromium, Firefox and WebKit
+        env:
+          TARBALL: ${{ runner.temp }}/pack/${{ needs.pack.outputs.tarball }}
+        run: >-
+          node e2e/run.mjs --tarball "$TARBALL"
+          --suites real-browsers --browsers chromium,firefox,webkit
+
+  # A real Electron window (sandbox, contextIsolation), driven by Playwright.
+  electron:
+    name: Electron app
+    needs: pack
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+          sparse-checkout: e2e
+      - uses: actions/download-artifact@v4
+        with:
+          name: package-tarball
+          path: ${{ runner.temp }}/pack
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - name: Electron under a virtual display
+        env:
+          TARBALL: ${{ runner.temp }}/pack/${{ needs.pack.outputs.tarball }}
+        run: xvfb-run -a node e2e/run.mjs --tarball "$TARBALL" --suites electron-app --electron
+
+  # One stable status check to mark as required, whatever the jobs above contain.
+  e2e:
+    name: E2E
+    needs: [changes, pack, matrix, browsers, electron]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: All end-user test jobs passed
+        env:
+          CHANGES_RESULT: ${{ needs.changes.result }}
+          CODE: ${{ needs.changes.outputs.code }}
+          PACK_RESULT: ${{ needs.pack.result }}
+          MATRIX_RESULT: ${{ needs.matrix.result }}
+          BROWSERS_RESULT: ${{ needs.browsers.result }}
+          ELECTRON_RESULT: ${{ needs.electron.result }}
+        run: |
+          echo "changes: $CHANGES_RESULT (code=$CODE), pack: $PACK_RESULT"
+          echo "matrix: $MATRIX_RESULT, browsers: $BROWSERS_RESULT, electron: $ELECTRON_RESULT"
+          if [ "$CHANGES_RESULT" = success ] && [ "$CODE" = false ]; then
+            echo "Only docs/config changed; end-user suite skipped."
+            exit 0
+          fi
+          [ "$PACK_RESULT" = success ] && [ "$MATRIX_RESULT" = success ] \
+            && [ "$BROWSERS_RESULT" = success ] && [ "$ELECTRON_RESULT" = success ]

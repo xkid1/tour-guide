@@ -1,0 +1,14 @@
+{
+  // Editor settings only. The e2e suite is plain JavaScript that runs inside a temporary
+  // consumer project (see run.mjs); consumer type-checking lives in consumer/types/.
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "checkJs": false,
+    "allowJs": true,
+    "noEmit": true
+  },
+  "include": ["**/*.mjs"],
+  "exclude": ["consumer/types/**"]
+}

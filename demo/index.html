@@ -1,0 +1,1256 @@
+<!doctype html>
+<html
+  lang="en"
+  data-theme="light"
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>tour-guide demo</title>
+    <style>
+      tour-guide:not(:defined) {
+        display: none;
+      }
+
+      :root {
+        --bg: #f8fafc;
+        --surface: #ffffff;
+        --surface-2: #f1f5f9;
+        --border: #e2e8f0;
+        --text: #0f172a;
+        --muted: #64748b;
+        --accent: #7c3aed;
+        --accent-soft: #ede9fe;
+        --shadow: 0 1px 2px rgb(15 23 42 / 0.06), 0 8px 24px -12px rgb(15 23 42 / 0.18);
+        color-scheme: light;
+      }
+      :root[data-theme='dark'] {
+        --bg: #0b1120;
+        --surface: #111827;
+        --surface-2: #1f2937;
+        --border: #263043;
+        --text: #e5e7eb;
+        --muted: #94a3b8;
+        --accent: #a78bfa;
+        --accent-soft: #2e1065;
+        --shadow: 0 1px 2px rgb(0 0 0 / 0.4), 0 8px 24px -12px rgb(0 0 0 / 0.6);
+        color-scheme: dark;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      .icon {
+        width: 16px;
+        height: 16px;
+        flex: none;
+      }
+      body {
+        margin: 0;
+        font-family:
+          system-ui,
+          -apple-system,
+          'Segoe UI',
+          Roboto,
+          sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.5;
+      }
+      a {
+        color: inherit;
+      }
+      button {
+        font: inherit;
+        color: inherit;
+      }
+      h1,
+      h2,
+      h3 {
+        margin: 0;
+        line-height: 1.25;
+      }
+      p {
+        margin: 0;
+      }
+
+      /* ---- Header ---------------------------------------------------------------- */
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 12px 24px;
+        background: color-mix(in srgb, var(--surface) 88%, transparent);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--border);
+      }
+      .logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 700;
+        text-decoration: none;
+        padding: 4px 6px;
+        border-radius: 8px;
+      }
+      .logo-mark {
+        display: grid;
+        place-items: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: var(--accent);
+        color: #fff;
+        font-size: 14px;
+      }
+      .nav {
+        display: flex;
+        gap: 4px;
+        margin-right: auto;
+      }
+      .nav a {
+        padding: 6px 10px;
+        border-radius: 8px;
+        text-decoration: none;
+        color: var(--muted);
+      }
+      .nav a:hover,
+      .nav a[aria-current='page'] {
+        color: var(--text);
+        background: var(--surface-2);
+      }
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .btn:hover {
+        background: var(--surface-2);
+      }
+      .btn-primary {
+        background: var(--accent);
+        border-color: var(--accent);
+        color: #fff;
+      }
+      .btn-primary:hover {
+        background: var(--accent);
+        filter: brightness(1.08);
+      }
+      .btn:focus-visible,
+      .nav a:focus-visible,
+      .menu-item:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+
+      /* ---- Dropdown menu --------------------------------------------------------- */
+      .menu-wrap {
+        position: relative;
+      }
+      .menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        width: 240px;
+        padding: 6px;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        transform-origin: top right;
+        animation: menu-in 160ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .menu-header {
+        padding: 8px 10px;
+        border-bottom: 1px solid var(--border);
+        margin-bottom: 4px;
+      }
+      .menu-header small {
+        color: var(--muted);
+      }
+      .menu-item {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border: 0;
+        border-radius: 8px;
+        background: transparent;
+        text-align: left;
+        cursor: pointer;
+      }
+      .menu-item:hover {
+        background: var(--surface-2);
+      }
+      .menu-item.danger {
+        color: #dc2626;
+      }
+      @keyframes menu-in {
+        from {
+          opacity: 0;
+          transform: translateY(-4px) scale(0.97);
+        }
+      }
+
+      /* ---- Layout ---------------------------------------------------------------- */
+      .page {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 32px 24px 64px;
+        display: grid;
+        gap: 24px;
+      }
+      .hero {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: end;
+        justify-content: space-between;
+        gap: 16px;
+      }
+      .hero h1 {
+        font-size: clamp(24px, 4vw, 32px);
+      }
+      .hero p {
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: var(--shadow);
+      }
+      .card h3 {
+        font-size: 15px;
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .metric {
+        font-size: 28px;
+        font-weight: 700;
+        margin-top: 6px;
+      }
+      .trend {
+        font-size: 13px;
+        color: #16a34a;
+      }
+      .trend.down {
+        color: #dc2626;
+      }
+      .split {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 16px;
+      }
+      @media (max-width: 860px) {
+        .split {
+          grid-template-columns: 1fr;
+        }
+      }
+      .section-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      .section-title h2 {
+        font-size: 17px;
+      }
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      th,
+      td {
+        text-align: left;
+        padding: 10px 8px;
+        border-bottom: 1px solid var(--border);
+        white-space: nowrap;
+      }
+      th {
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .pill {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+
+      /* Playground + event log */
+      .controls {
+        display: grid;
+        gap: 12px;
+      }
+      .controls label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        font-size: 14px;
+      }
+      select,
+      input[type='text'] {
+        font: inherit;
+        color: inherit;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 6px 8px;
+      }
+      .log {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        font:
+          12px/1.6 ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          monospace;
+        max-height: 220px;
+        overflow: auto;
+      }
+      .log li {
+        padding: 4px 0;
+        border-bottom: 1px dashed var(--border);
+      }
+      .log li b {
+        color: var(--accent);
+        font-weight: 600;
+      }
+      .log:empty::before {
+        content: 'Events will appear here…';
+        color: var(--muted);
+      }
+
+      /* ---- Footer ---------------------------------------------------------------- */
+      .footer {
+        border-top: 1px solid var(--border);
+        background: var(--surface);
+      }
+      .footer-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 32px 24px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .footer-links {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 20px;
+      }
+      .footer-links a {
+        color: var(--muted);
+        text-decoration: none;
+      }
+      .footer-links a:hover {
+        color: var(--text);
+      }
+
+      /* ---- Modal ----------------------------------------------------------------- */
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 1000;
+        display: grid;
+        place-items: center;
+        padding: 16px;
+        background: rgb(15 23 42 / 0.45);
+        animation: fade-in 180ms ease;
+      }
+      .modal {
+        width: min(480px, 100%);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        box-shadow: 0 24px 48px -12px rgb(0 0 0 / 0.35);
+        animation: modal-in 220ms cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      .modal header,
+      .modal footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 16px 20px;
+      }
+      .modal header {
+        border-bottom: 1px solid var(--border);
+      }
+      .modal footer {
+        border-top: 1px solid var(--border);
+        justify-content: flex-end;
+      }
+      .modal-body {
+        display: grid;
+        gap: 16px;
+        padding: 20px;
+      }
+      .field {
+        display: grid;
+        gap: 6px;
+        font-size: 14px;
+      }
+      .field small {
+        color: var(--muted);
+      }
+      .switch {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+      }
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+        }
+      }
+      @keyframes modal-in {
+        from {
+          opacity: 0;
+          transform: translateY(12px) scale(0.97);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .menu,
+        .modal,
+        .modal-backdrop {
+          animation: none;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .topbar {
+          flex-wrap: wrap;
+          padding: 12px 16px;
+        }
+        .nav {
+          order: 3;
+          width: 100%;
+          overflow-x: auto;
+        }
+        .page {
+          padding: 24px 16px 48px;
+        }
+      }
+
+      /* ---- Tour theming: shared by every tour on the page ------------------------ */
+      tour-guide {
+        --tg-primary: #7c3aed;
+        --tg-primary-hover: #6d28d9;
+        --tg-popover-radius: 14px;
+      }
+      tour-guide::part(title) {
+        letter-spacing: -0.01em;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="topbar">
+      <a
+        href="#"
+        class="logo"
+        id="logo"
+        ><span
+          class="logo-mark"
+          aria-hidden="true"
+          >A</span
+        >Acme</a
+      >
+      <nav
+        class="nav"
+        aria-label="Main"
+      >
+        <a
+          href="#"
+          aria-current="page"
+          >Dashboard</a
+        >
+        <a
+          href="#"
+          id="nav-reports"
+          >Reports</a
+        >
+        <a
+          href="#"
+          id="nav-docs"
+          >Docs</a
+        >
+      </nav>
+      <div class="toolbar">
+        <button
+          class="btn"
+          id="open-settings"
+          type="button"
+        >
+          <svg
+            class="icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <circle
+              cx="12"
+              cy="12"
+              r="3"
+            />
+            <path
+              d="M12 2v3M12 19v3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M2 12h3M19 12h3M4.9 19.1 7 17M17 7l2.1-2.1"
+            /></svg
+          >Settings
+        </button>
+        <div class="menu-wrap">
+          <button
+            class="btn"
+            id="workspace-button"
+            type="button"
+            aria-haspopup="menu"
+            aria-expanded="false"
+            aria-controls="workspace-menu"
+          >
+            Workspace ▾
+          </button>
+          <div
+            class="menu"
+            id="workspace-menu"
+            role="menu"
+            aria-labelledby="workspace-button"
+            hidden
+          >
+            <div class="menu-header">
+              <strong>Acme Inc.</strong><br />
+              <small>Pro plan · 12 members</small>
+            </div>
+            <button
+              class="menu-item"
+              role="menuitem"
+              id="menu-switch"
+              type="button"
+            >
+              <svg
+                class="icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="m17 2 4 4-4 4" />
+                <path d="M3 11V9a3 3 0 0 1 3-3h15" />
+                <path d="m7 22-4-4 4-4" />
+                <path d="M21 13v2a3 3 0 0 1-3 3H3" /></svg
+              >Switch workspace
+            </button>
+            <button
+              class="menu-item"
+              role="menuitem"
+              id="menu-invite"
+              type="button"
+            >
+              <svg
+                class="icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <rect
+                  x="2"
+                  y="4"
+                  width="20"
+                  height="16"
+                  rx="2"
+                />
+                <path d="m22 6-10 7L2 6" /></svg
+              >Invite people
+            </button>
+            <button
+              class="menu-item"
+              role="menuitem"
+              id="menu-billing"
+              type="button"
+            >
+              <svg
+                class="icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <rect
+                  x="2"
+                  y="5"
+                  width="20"
+                  height="14"
+                  rx="2"
+                />
+                <path d="M2 10h20" /></svg
+              >Billing &amp; plans
+            </button>
+            <button
+              class="menu-item danger"
+              role="menuitem"
+              id="menu-signout"
+              type="button"
+            >
+              <svg
+                class="icon"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <path d="m16 17 5-5-5-5" />
+                <path d="M21 12H9" /></svg
+              >Sign out
+            </button>
+          </div>
+        </div>
+        <button
+          class="btn btn-primary"
+          id="start"
+          type="button"
+        >
+          Start tour
+        </button>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="hero">
+        <div>
+          <h1>Good morning, Sam</h1>
+          <p>Here's what happened in your workspace this week.</p>
+        </div>
+        <button
+          class="btn"
+          id="new-report"
+          type="button"
+        >
+          <svg
+            class="icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M12 5v14M5 12h14" /></svg
+          >New report
+        </button>
+      </section>
+
+      <section
+        class="grid"
+        id="stats"
+        aria-label="Key metrics"
+      >
+        <article class="card">
+          <h3>Revenue</h3>
+          <div class="metric">$48,210</div>
+          <span class="trend">▲ 12.4% vs last week</span>
+        </article>
+        <article class="card">
+          <h3>Active users</h3>
+          <div class="metric">3,842</div>
+          <span class="trend">▲ 4.1%</span>
+        </article>
+        <article class="card">
+          <h3>Churn</h3>
+          <div class="metric">1.8%</div>
+          <span class="trend down">▼ 0.3%</span>
+        </article>
+      </section>
+
+      <section class="split">
+        <article
+          class="card"
+          id="activity"
+        >
+          <div class="section-title">
+            <h2>Recent activity</h2>
+            <span class="pill">Live</span>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Plan</th>
+                  <th>Amount</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="activity-rows"></tbody>
+            </table>
+          </div>
+        </article>
+
+        <div class="controls">
+          <article
+            class="card controls"
+            id="playground"
+          >
+            <div class="section-title">
+              <h2>Playground</h2>
+            </div>
+            <label
+              >Theme
+              <select id="theme">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="auto">System</option>
+              </select>
+            </label>
+            <label
+              >Placement
+              <select id="placement">
+                <option value="auto">auto</option>
+                <option value="top">top</option>
+                <option value="bottom">bottom</option>
+                <option value="left">left</option>
+                <option value="right">right</option>
+              </select>
+            </label>
+            <label
+              >Dim backdrop
+              <input
+                type="checkbox"
+                id="backdrop"
+                checked
+            /></label>
+            <label
+              >Contextual tours every time
+              <input
+                type="checkbox"
+                id="replay"
+                checked
+            /></label>
+            <label
+              >Resume a skipped tour on reload
+              <input
+                type="checkbox"
+                id="resume"
+                checked
+            /></label>
+          </article>
+          <article class="card">
+            <div class="section-title">
+              <h2>Event log</h2>
+              <button
+                class="btn"
+                id="clear-log"
+                type="button"
+              >
+                Clear
+              </button>
+            </div>
+            <ol
+              class="log"
+              id="log"
+              aria-live="polite"
+            ></ol>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        <span>© 2026 Acme Inc.</span>
+        <nav
+          class="footer-links"
+          id="footer-help"
+          aria-label="Help"
+        >
+          <a href="#">Help center</a>
+          <a href="#">Changelog</a>
+          <a href="#">Status</a>
+          <a href="#">Privacy</a>
+        </nav>
+        <button
+          class="btn"
+          id="contact"
+          type="button"
+        >
+          <svg
+            class="icon"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path
+              d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+            /></svg
+          >Contact support
+        </button>
+      </div>
+    </footer>
+
+    <!-- Settings modal (any modal works: the tour sits above it thanks to --tg-z-index) -->
+    <div
+      class="modal-backdrop"
+      id="settings-modal"
+      hidden
+    >
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-title"
+      >
+        <header>
+          <h2
+            id="settings-title"
+            style="font-size: 17px"
+          >
+            Settings
+          </h2>
+          <button
+            class="btn"
+            id="close-settings"
+            type="button"
+            aria-label="Close settings"
+          >
+            ✕
+          </button>
+        </header>
+        <div class="modal-body">
+          <label
+            class="field"
+            id="field-name"
+            >Workspace name
+            <input
+              type="text"
+              value="Acme Inc."
+            />
+            <small>Shown in invites and emails.</small>
+          </label>
+          <div
+            class="switch"
+            id="field-notify"
+          >
+            <span
+              >Weekly email digest<br /><small style="color: var(--muted)"
+                >Every Monday at 9:00</small
+              ></span
+            >
+            <input
+              type="checkbox"
+              checked
+              aria-label="Weekly email digest"
+            />
+          </div>
+          <label
+            class="field"
+            id="field-region"
+            >Data region
+            <select>
+              <option>EU (Frankfurt)</option>
+              <option>US (Virginia)</option>
+            </select>
+          </label>
+        </div>
+        <footer>
+          <button
+            class="btn"
+            id="cancel-settings"
+            type="button"
+          >
+            Cancel
+          </button>
+          <button
+            class="btn btn-primary"
+            id="save-settings"
+            type="button"
+          >
+            Save changes
+          </button>
+        </footer>
+      </div>
+    </div>
+
+    <!-- 1. Main tour, fully declarative. The last steps live in the footer: the page scrolls to them. -->
+    <!-- Skipping or closing saves the step; a reload resumes there (enableResume, see script). -->
+    <tour-guide id="main-tour">
+      <tour-step title="Welcome to Acme"
+        >A quick 30-second tour of the essentials. Use ← / → to navigate.</tour-step
+      >
+      <tour-step
+        target="#logo"
+        title="Home"
+        placement="bottom"
+        >Click the logo to return to your dashboard anytime.</tour-step
+      >
+      <tour-step
+        target="#nav-reports"
+        title="Reports"
+        >Build and schedule reports for your team.</tour-step
+      >
+      <tour-step
+        target="#stats"
+        title="Key metrics"
+        >Your <strong>weekly</strong> numbers, updated every hour.</tour-step
+      >
+      <tour-step
+        target="#activity"
+        title="Recent activity"
+        placement="right"
+        >Every payment and plan change, as it happens.</tour-step
+      >
+      <tour-step
+        target="#workspace-button"
+        title="Workspace menu"
+        >Click it! The menu has its own tour, then this one picks up where it left
+        off.</tour-step
+      >
+      <tour-step
+        target="#open-settings"
+        title="Settings"
+        >Click to open settings in a modal. It has a tour too.</tour-step
+      >
+      <tour-step
+        target="#footer-help"
+        title="Need help?"
+        placement="top"
+        >Docs, changelog and service status live down here. The page scrolled for
+        you.</tour-step
+      >
+      <tour-step
+        target="#contact"
+        title="Talk to us"
+        placement="top"
+        >Our team replies within a few hours.</tour-step
+      >
+    </tour-guide>
+
+    <!-- 2. Contextual tour, started when the workspace menu opens. -->
+    <tour-guide
+      id="menu-tour"
+      close-on-backdrop-click
+    >
+      <tour-step
+        target="#menu-switch"
+        title="Switch workspaces"
+        placement="left"
+        >Jump between every workspace you belong to.</tour-step
+      >
+      <tour-step
+        target="#menu-invite"
+        title="Invite people"
+        placement="left"
+        >Send invites by email or share a link.</tour-step
+      >
+      <tour-step
+        target="#menu-billing"
+        title="Billing"
+        placement="left"
+        >Change plans and download invoices.</tour-step
+      >
+    </tour-guide>
+
+    <!-- 3. Contextual tour, started when the settings modal opens. -->
+    <tour-guide id="modal-tour">
+      <tour-step
+        target="#field-name"
+        title="Name your workspace"
+        placement="right"
+        >This is what teammates see in invites.</tour-step
+      >
+      <tour-step
+        target="#field-notify"
+        title="Stay in the loop"
+        placement="right"
+        >A weekly summary straight to your inbox.</tour-step
+      >
+      <tour-step
+        target="#field-region"
+        title="Data residency"
+        placement="right"
+        >Choose where your data is stored.</tour-step
+      >
+      <tour-step
+        target="#save-settings"
+        title="Save"
+        placement="top"
+        >Changes apply to everyone in the workspace.</tour-step
+      >
+    </tour-guide>
+
+    <script type="module">
+      import '/src/apps/browser/index.ts';
+      import { enableResume } from '/src/apps/resume/index.ts';
+
+      const $ = (selector) => document.querySelector(selector);
+      const tours = {
+        main: $('#main-tour'),
+        menu: $('#menu-tour'),
+        modal: $('#modal-tour'),
+      };
+      const allTours = Object.values(tours);
+      const anyTourActive = () => allTours.some((tour) => tour.isActive);
+
+      // ---- Demo content: enough rows to make the page scroll ----------------------
+      const customers = [
+        'Northwind',
+        'Bluebird',
+        'Pinecrest',
+        'Lumen Labs',
+        'Harbor & Co',
+        'Orchard',
+        'Fieldstone',
+        'Brightpath',
+        'Quarry',
+        'Meridian',
+        'Copperleaf',
+        'Saltwater',
+      ];
+      $('#activity-rows').innerHTML = customers
+        .map(
+          (name, i) =>
+            `<tr><td>${name}</td><td><span class="pill">${['Pro', 'Team', 'Enterprise'][i % 3]}</span></td><td>$${(((i * 7919) % 900) + 100).toFixed(2)}</td><td>Nov ${18 - (i % 18)}</td></tr>`,
+        )
+        .join('');
+
+      // ---- Contextual tours run once per page load unless "every time" is checked ---
+      const seen = new Set();
+      const shouldRun = (name) => $('#replay').checked || !seen.has(name);
+      const startContextual = (name, force = false) => {
+        if (!force && (!shouldRun(name) || tours.main.isActive)) return;
+        seen.add(name);
+        void tours[name].start(0);
+      };
+
+      // The highlighted target stays clickable (allowTargetInteraction, on by default).
+      // Opening the menu or modal mid-tour pauses the main tour, runs the contextual one, and
+      // resumes the main tour at the next step once the menu / modal closes.
+      let pausedAt = null;
+      const pauseMain = () => {
+        if (!tours.main.isActive) return false;
+        pausedAt = tours.main.currentIndex;
+        tours.main.close();
+        return true;
+      };
+      const resumeMain = () => {
+        if (pausedAt === null) return;
+        const next = pausedAt + 1;
+        pausedAt = null;
+        if (next < tours.main.total) void tours.main.start(next);
+      };
+
+      /** Runs `fn` after the element's own open animation, so targets are measured in place. */
+      const afterOpenAnimation = (element, fn) => {
+        const running = element.getAnimations?.({ subtree: true }) ?? [];
+        Promise.all(running.map((a) => a.finished.catch(() => {}))).then(fn);
+      };
+
+      // ---- Workspace dropdown menu ---------------------------------------------------
+      const menuButton = $('#workspace-button');
+      const menu = $('#workspace-menu');
+      const setMenu = (open) => {
+        if (menu.hidden !== open) return;
+        menu.hidden = !open;
+        menuButton.setAttribute('aria-expanded', String(open));
+        if (open) {
+          const paused = pauseMain();
+          menu.querySelector('.menu-item').focus();
+          afterOpenAnimation(menu, () => startContextual('menu', paused));
+        } else {
+          tours.menu.close();
+          resumeMain();
+        }
+      };
+      menuButton.addEventListener('click', () => setMenu(menu.hidden));
+      // Clicks inside a tour (its popover lives in a shadow root) must not close the menu.
+      document.addEventListener('click', (event) => {
+        const path = event.composedPath();
+        if (path.includes(menu) || path.includes(menuButton)) return;
+        if (path.some((node) => node.localName === 'tour-guide')) return;
+        setMenu(false);
+      });
+      menu.addEventListener('click', (event) => {
+        if (event.target.closest('.menu-item')) setMenu(false);
+      });
+
+      // ---- Settings modal ------------------------------------------------------------
+      const modal = $('#settings-modal');
+      let modalOpener = null;
+      const setModal = (open) => {
+        if (modal.hidden !== open) return;
+        modal.hidden = !open;
+        if (open) {
+          modalOpener = document.activeElement;
+          const paused = pauseMain();
+          modal.querySelector('input').focus();
+          afterOpenAnimation(modal, () => startContextual('modal', paused));
+        } else {
+          tours.modal.close();
+          modalOpener?.focus();
+          resumeMain();
+        }
+      };
+      $('#open-settings').addEventListener('click', () => {
+        setMenu(false);
+        setModal(true);
+      });
+      for (const id of ['#close-settings', '#cancel-settings', '#save-settings']) {
+        $(id).addEventListener('click', () => setModal(false));
+      }
+      modal.addEventListener('click', (event) => {
+        if (event.target === modal) setModal(false);
+      });
+
+      // Escape belongs to an active tour first, then the modal, then the menu.
+      document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape' || event.defaultPrevented || anyTourActive()) return;
+        if (!modal.hidden) setModal(false);
+        else setMenu(false);
+      });
+
+      // ---- Main tour -------------------------------------------------------------------
+      $('#start').addEventListener('click', () => {
+        pausedAt = null;
+        setMenu(false);
+        setModal(false);
+        void tours.main.start(0);
+      });
+
+      // Resume where the user skipped or closed the tour last time (@xkid1/tour-guide/resume).
+      // The saved step is cleared when the tour is completed.
+      const resumeToggle = $('#resume');
+      try {
+        resumeToggle.checked = localStorage.getItem('demo:resume') !== 'off';
+      } catch {
+        // storage blocked: keep the default
+      }
+      let resume = null;
+      const applyResume = () => {
+        resume?.destroy();
+        resume = null;
+        if (resumeToggle.checked)
+          resume = enableResume(tours.main, { key: 'acme-onboarding' });
+        else localStorage.removeItem('tour-guide:acme-onboarding');
+        try {
+          localStorage.setItem('demo:resume', resumeToggle.checked ? 'on' : 'off');
+        } catch {
+          // ignore
+        }
+      };
+      resumeToggle.addEventListener('change', applyResume);
+      applyResume();
+      if (resume?.savedIndex != null) void resume.start();
+
+      // ---- Playground ------------------------------------------------------------------
+      const applyTheme = (theme) => {
+        const dark =
+          theme === 'dark' ||
+          (theme === 'auto' && matchMedia('(prefers-color-scheme: dark)').matches);
+        document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+        allTours.forEach((tour) => tour.setAttribute('theme', theme));
+      };
+      $('#theme').addEventListener('change', (event) => applyTheme(event.target.value));
+      matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () =>
+        applyTheme($('#theme').value),
+      );
+      applyTheme($('#theme').value);
+
+      $('#placement').addEventListener('change', (event) => {
+        allTours.forEach(
+          (tour) => (tour.options = { ...tour.options, placement: event.target.value }),
+        );
+      });
+      $('#backdrop').addEventListener('change', (event) => {
+        allTours.forEach(
+          (tour) => (tour.options = { ...tour.options, backdrop: event.target.checked }),
+        );
+      });
+
+      // ---- Event log ---------------------------------------------------------------------
+      const log = $('#log');
+      const events = [
+        'tour-start',
+        'tour-step-change',
+        'tour-complete',
+        'tour-skip',
+        'tour-close',
+      ];
+      for (const [name, tour] of Object.entries(tours)) {
+        for (const type of events) {
+          tour.addEventListener(type, ({ detail }) => {
+            const item = document.createElement('li');
+            const step = detail.step?.title ? ` · ${detail.step.title}` : '';
+            item.innerHTML = `<b>${name}</b> ${type}`;
+            item.append(` #${detail.index}${step}`);
+            log.prepend(item);
+            while (log.children.length > 30) log.lastElementChild.remove();
+          });
+        }
+      }
+      $('#clear-log').addEventListener('click', () => log.replaceChildren());
+    </script>
+  </body>
+</html>
