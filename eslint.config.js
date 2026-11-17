@@ -49,6 +49,8 @@ export default defineConfig(
       'examples/**',
       // End-user suite: runs inside a temporary consumer project (see e2e/run.mjs).
       'e2e/**',
+      // Manual playground apps that install the packed tarball (local-only, see misc/repack.mjs).
+      'misc/**',
     ],
   },
 

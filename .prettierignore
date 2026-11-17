@@ -9,3 +9,4 @@ package-lock.json
 bench-results
 e2e/consumer/.svelte-out
 e2e/consumer/dist-bundles
+misc
