@@ -23,7 +23,7 @@ jobs:
     outputs:
       code: ${{ steps.changes.outputs.code }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - id: changes
@@ -37,7 +37,7 @@ jobs:
     if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: ./.github/actions/setup
       - name: Tests with coverage
         run: yarn coverage --coverage.reporter=text --coverage.reporter=text-summary --coverage.reporter=lcov
@@ -57,7 +57,7 @@ jobs:
           console.log(`| ${pct('LH', 'LF')}% | ${pct('FNH', 'FNF')}% | ${pct('BRH', 'BRF')}% |`);
           NODE
           fi
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage

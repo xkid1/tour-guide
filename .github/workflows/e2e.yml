@@ -43,7 +43,7 @@ jobs:
     outputs:
       code: ${{ steps.changes.outputs.code }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - id: changes
@@ -57,7 +57,7 @@ jobs:
     outputs:
       tarball: ${{ steps.pack.outputs.tarball }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref || github.ref }}
       - uses: ./.github/actions/setup
@@ -67,7 +67,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/pack"
           TARBALL=$(npm pack --pack-destination "$RUNNER_TEMP/pack" --loglevel=error | tail -1)
           echo "tarball=$TARBALL" >> "$GITHUB_OUTPUT"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: package-tarball
           path: ${{ runner.temp }}/pack/*.tgz
@@ -97,15 +97,15 @@ jobs:
             deps: --dep svelte@^4.2.0
     steps:
       # Only the e2e/ folder is needed; the package itself comes from the tarball.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref || github.ref }}
           sparse-checkout: e2e
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: package-tarball
           path: ${{ runner.temp }}/pack
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node }}
       - name: Enable pnpm
@@ -127,15 +127,15 @@ jobs:
     needs: pack
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref || github.ref }}
           sparse-checkout: e2e
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: package-tarball
           path: ${{ runner.temp }}/pack
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
       - name: Chromium, Firefox and WebKit
@@ -151,15 +151,15 @@ jobs:
     needs: pack
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           ref: ${{ inputs.ref || github.ref }}
           sparse-checkout: e2e
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: package-tarball
           path: ${{ runner.temp }}/pack
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with:
           node-version: 24
       - name: Electron under a virtual display
