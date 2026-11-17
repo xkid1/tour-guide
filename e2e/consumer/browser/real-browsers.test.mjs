@@ -133,24 +133,15 @@ for (const name of BROWSERS) {
       await page.close();
     });
 
-    it(
-      'strict CSP (no unsafe-inline): rendering reports no violations',
-      {
-        // Known issue: applyStyles() always appends an (empty) <style data-tg-custom> next to
-        // the adopted sheet, which a strict style-src blocks and reports. Remove `todo` once
-        // custom CSS also goes through a constructable stylesheet.
-        todo: 'applyStyles() appends an inline <style> even with adoptedStyleSheets',
-      },
-      async () => {
-        const page = await browser.newPage();
-        await open(page, '/browser/iife.strict.html');
-        await page.click('#opener');
-        await page.locator(popover).waitFor({ state: 'visible' });
-        await page.waitForTimeout(50);
-        assert.deepEqual(await page.evaluate(() => window.__violations), []);
-        await page.close();
-      },
-    );
+    it('strict CSP (no unsafe-inline): rendering reports no violations', async () => {
+      const page = await browser.newPage();
+      await open(page, '/browser/iife.strict.html');
+      await page.click('#opener');
+      await page.locator(popover).waitFor({ state: 'visible' });
+      await page.waitForTimeout(50);
+      assert.deepEqual(await page.evaluate(() => window.__violations), []);
+      await page.close();
+    });
 
     it('native ES modules from dist/ load without a bundler', async () => {
       const page = await browser.newPage();

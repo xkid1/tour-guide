@@ -4,6 +4,7 @@ import type {
   RendererHandlers,
   RenderState,
   ResolvedTourOptions,
+  ShadowStyles,
   Size,
 } from '@types';
 import { afterAnimations, h, setHidden, setTrustedMarkup, toNode, uid } from '@utils';
@@ -34,7 +35,7 @@ export class TourRenderer {
   readonly skipButton: HTMLButtonElement;
   readonly primaryButton: HTMLButtonElement;
 
-  readonly #customStyle: HTMLStyleElement;
+  readonly #styles: ShadowStyles;
   readonly #handlers: RendererHandlers;
   readonly #ids = { title: uid('tg-title'), body: uid('tg-body') };
   #icons = { close: '', back: '' };
@@ -50,7 +51,7 @@ export class TourRenderer {
     options: ResolvedTourOptions,
   ) {
     this.#handlers = handlers;
-    this.#customStyle = applyStyles(shadow, options.styles);
+    this.#styles = applyStyles(shadow, options.styles);
 
     this.backdrop = h('div', { class: 'backdrop', part: 'backdrop' });
     this.spotlight = h('div', { class: 'spotlight', part: 'spotlight', hidden: true });
@@ -196,7 +197,7 @@ export class TourRenderer {
   }
 
   setCustomStyles(css: string): void {
-    if (this.#customStyle.textContent !== css) this.#customStyle.textContent = css;
+    this.#styles.setCustom(css);
   }
 
   update(state: RenderState): void {

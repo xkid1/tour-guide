@@ -2,7 +2,13 @@
 
 All notable changes to this project are documented here. This project follows [Semantic Versioning](https://semver.org).
 
-## Unreleased
+## 0.1.0
+
+First public release.
+
+- `<tour-guide>` custom element with header (title + close), footer (back icon, skip, next/complete), spotlight, responsive bottom sheet, focus trap, keyboard navigation, theming via CSS variables / parts / slots, declarative `<tour-step>` children.
+- Adapters: browser (`createTour`), React, Vue, Angular, Android / React Native WebView guide.
+- Builds: ESM + d.ts, IIFE/ES single-file bundles, Custom Elements Manifest.
 
 ### Added
 
@@ -20,14 +26,9 @@ All notable changes to this project are documented here. This project follows [S
 
 ### Fixed
 
+- Works under a strict CSP (`style-src 'self'`, no `'unsafe-inline'`) without violation reports: an empty inline `<style>` was always added to the shadow root. CSS from the `styles` option now also goes through a constructable stylesheet, created only when there is CSS. Older WebViews without constructable stylesheets still fall back to `<style>`.
 - Cancelling or failing the first step (via `tour-before-change` or a hook) left an empty overlay and listeners behind. `tour-start` now fires only once the first step is accepted.
 - The logger crashed in browsers and WebViews (it read `process` unguarded).
 - The popover could be clamped underneath a classic scrollbar. The viewport size now excludes it.
 - The spotlight no longer lags behind its target while the page scrolls (its position transition now runs only during step changes).
 - Repositions on `visualViewport` changes (on-screen keyboard, pinch zoom). Popover height uses `dvh` where supported. Sheets respect all safe-area insets.
-
-## 0.1.0
-
-- Initial release: `<tour-guide>` custom element with header (title + close), footer (back icon, skip, next/complete), spotlight, responsive bottom sheet, focus trap, keyboard navigation, theming via CSS variables / parts / slots, declarative `<tour-step>` children.
-- Adapters: browser (`createTour`), React, Vue, Angular, Android / React Native WebView guide.
-- Builds: ESM + d.ts, IIFE/ES single-file bundles, Custom Elements Manifest.

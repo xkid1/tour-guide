@@ -12,6 +12,12 @@ export interface RendererHandlers {
   onContentError?: (error: unknown) => void;
 }
 
+/** Returned by `applyStyles()`: updates one shadow root's custom CSS (the `styles` option). */
+export interface ShadowStyles {
+  /** Sets the custom CSS. Nothing is created until there is CSS to apply. */
+  setCustom: (css: string) => void;
+}
+
 /** Everything the `TourRenderer` needs to draw one step. */
 export interface RenderState {
   context: StepContext;
