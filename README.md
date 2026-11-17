@@ -1,5 +1,30 @@
 # @xkid1/tour-guide
 
+[![CI](https://img.shields.io/github/actions/workflow/status/xkid1/tour-guide/ci.yml?branch=main&label=CI&logo=github)](https://github.com/xkid1/tour-guide/actions/workflows/ci.yml)
+[![Build](https://img.shields.io/github/actions/workflow/status/xkid1/tour-guide/build.yml?branch=main&label=Build&logo=github)](https://github.com/xkid1/tour-guide/actions/workflows/build.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/xkid1/tour-guide/test.yml?branch=main&label=Tests&logo=github)](https://github.com/xkid1/tour-guide/actions/workflows/test.yml)
+[![E2E](https://img.shields.io/github/actions/workflow/status/xkid1/tour-guide/e2e.yml?branch=main&label=E2E&logo=github)](https://github.com/xkid1/tour-guide/actions/workflows/e2e.yml)
+[![CodeQL](https://img.shields.io/github/actions/workflow/status/xkid1/tour-guide/codeql.yml?branch=main&label=CodeQL&logo=github)](https://github.com/xkid1/tour-guide/actions/workflows/codeql.yml)
+[![OpenSSF Scorecard](https://img.shields.io/ossf-scorecard/github.com/xkid1/tour-guide?label=openssf%20scorecard)](https://scorecard.dev/viewer/?uri=github.com/xkid1/tour-guide)
+[![Publish package](https://img.shields.io/github/actions/workflow/status/xkid1/tour-guide/publish.yml?label=Publish%20package&logo=github)](https://github.com/xkid1/tour-guide/actions/workflows/publish.yml)
+[![npm](https://img.shields.io/npm/v/@xkid1/tour-guide?logo=npm&label=npm&color=orange)](https://www.npmjs.com/package/@xkid1/tour-guide)
+[![GitHub Packages](https://img.shields.io/badge/npm-xkid1-red?logo=github)](https://github.com/xkid1/tour-guide/pkgs/npm/tour-guide)
+[![License: MIT](https://img.shields.io/github/license/xkid1/tour-guide?label=license&color=blue)](LICENSE)
+[![Dependencies: 0](https://img.shields.io/badge/dependencies-0-brightgreen)](package.json)
+[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-ffdd00?logo=buymeacoffee&logoColor=black)](https://www.buymeacoffee.com/elmeralluaj)
+
+[![Node.js](https://img.shields.io/badge/Node.js-18%20%7C%2020%20%7C%2022%20%7C%2024%20%7C%2026-5FA04E?logo=nodedotjs&logoColor=white)](https://nodejs.org)
+[![TypeScript](https://img.shields.io/badge/TypeScript-types%20included-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org)
+[![Web Component](https://img.shields.io/badge/Web%20Component-%3Ctour--guide%3E-29ABE2?logo=webcomponentsdotorg&logoColor=white)](https://developer.mozilla.org/docs/Web/API/Web_components)
+[![React](https://img.shields.io/badge/React-18%20%7C%2019-20232A?logo=react&logoColor=61DAFB)](#react-1819-nextjs)
+[![Vue](https://img.shields.io/badge/Vue-3-4FC08D?logo=vuedotjs&logoColor=white)](#vue-3-nuxt)
+[![Svelte](https://img.shields.io/badge/Svelte-3%20%7C%204%20%7C%205-FF3E00?logo=svelte&logoColor=white)](#svelte-3-4-5-sveltekit)
+[![Angular](https://img.shields.io/badge/Angular-15%2B-DD0031?logo=angular&logoColor=white)](#angular-15)
+[![Electron](https://img.shields.io/badge/Electron-12%2B-47848F?logo=electron&logoColor=white)](#electron)
+[![Android / iOS WebView](https://img.shields.io/badge/WebView-Android%20%7C%20iOS%20%7C%20React%20Native-3DDC84?logo=android&logoColor=white)](#android--ios--react-native-webview)
+[![Browser](https://img.shields.io/badge/browser-ESM%20%7C%20IIFE%20%2F%20CDN-555555?logo=googlechrome&logoColor=white)](#3-script-tag-no-bundler)
+[![module](https://img.shields.io/badge/module-ESM-blue)](#entry-points)
+
 A **zero-dependency**, accessible and responsive product-tour **Web Component**:
 `<tour-guide>`. Use it to walk users through your app one step at a time: highlight an
 element, explain it, move on.

@@ -111,8 +111,10 @@ describe('package manifest', () => {
 
 describe('published files', () => {
   it('contains no tests, specs or TypeScript sources', () => {
+    const isTestFile = (file) => /\.(?:test|spec)\./.test(file);
+    const isTypeScriptSource = (file) => /\.tsx?$/.test(file) && !file.endsWith('.d.ts');
     const offenders = distFiles.filter(
-      (file) => /\.(test|spec)\.|\.tsx?$/.test(file) && !file.endsWith('.d.ts'),
+      (file) => isTestFile(file) || isTypeScriptSource(file),
     );
     assert.deepEqual(
       offenders.map((file) => relative(ROOT, file)),

@@ -25,6 +25,16 @@
     "type": "git",
     "url": "git+https://github.com/xkid1/tour-guide.git"
   },
+  "funding": [
+    {
+      "type": "github",
+      "url": "https://github.com/sponsors/xkid1"
+    },
+    {
+      "type": "buymeacoffee",
+      "url": "https://buymeacoffee.com/elmeralluaj"
+    }
+  ],
   "license": "MIT",
   "author": "xkid1",
   "type": "module",
