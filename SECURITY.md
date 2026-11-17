@@ -107,10 +107,10 @@ something it has to trust.
 ### Content Security Policy
 
 - The component never uses `eval`, `new Function` or inline scripts.
-- Styles are applied through constructable stylesheets (`adoptedStyleSheets`), which need
-  no `style-src 'unsafe-inline'` in current browsers. In older WebViews without
-  constructable stylesheets it falls back to `<style>` elements, which a strict
-  `style-src` would block.
+- Styles, including CSS from the `styles` option, are applied through constructable
+  stylesheets (`adoptedStyleSheets`), which need no `style-src 'unsafe-inline'` in current
+  browsers. In older WebViews without constructable stylesheets it falls back to `<style>`
+  elements, which a strict `style-src` would block.
 - **Trusted Types:** the built-in icons, and `content` when `allowHtml` is on, are parsed
   by assigning strings to `innerHTML` (on a `<template>`). Pages that enforce
   `require-trusted-types-for 'script'` need a default Trusted Types policy that allows

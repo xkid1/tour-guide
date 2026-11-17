@@ -21,7 +21,9 @@ const DIST = join(ROOT, 'dist');
 /** gzip budgets in bytes. @type {Record<string, number>} */
 const BUDGETS = {
   'browser/tour-guide.iife.js': 16 * 1024,
-  'browser/tour-guide.es.js': 17 * 1024,
+  // 17 → 18 kB: strict-CSP custom styles (per-instance constructable sheet). It sat at
+  // 16.94 kB with ~60 bytes of headroom before that.
+  'browser/tour-guide.es.js': 18 * 1024,
   // Whole unbundled ESM tree (dist/**/*.js without the bundles), comments included: an upper
   // bound for what `import` pulls in before the app's bundler minifies and tree-shakes it.
   // 30 → 32 kB: motion, mobile follow layout, clickable target and the ./resume entry.

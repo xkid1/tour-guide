@@ -867,8 +867,8 @@ tour-guide:not(:defined) {
 }
 ```
 
-For anything else, pass CSS through the `styles` option. It's injected into the shadow
-root.
+For anything else, pass CSS through the `styles` option. It's applied inside the shadow
+root as a constructable stylesheet, so it works under a strict CSP too.
 
 ### CSS variables
 

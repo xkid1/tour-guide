@@ -308,8 +308,11 @@ describe('<tour-guide>', () => {
     await element.start();
     expect($('slot').textContent).toBe('step 1/1');
     expect($('.close svg').getAttribute('data-custom')).toBe('x');
-    expect(shadow.querySelector('style[data-tg-custom]')?.textContent).toContain(
-      'color:red',
+    // Custom CSS goes through a constructable stylesheet: no inline <style> (strict CSP).
+    expect(shadow.querySelector('style')).toBeNull();
+    const custom = shadow.adoptedStyleSheets.at(-1);
+    expect([...(custom?.cssRules ?? [])].map((rule) => rule.cssText).join()).toContain(
+      'red',
     );
   });
 

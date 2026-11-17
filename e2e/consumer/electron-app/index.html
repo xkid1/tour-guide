@@ -2,11 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <!-- 'unsafe-inline' for styles only until applyStyles() stops appending an inline <style>
-         (see the strict CSP todo in browser/real-browsers.test.mjs). -->
+    <!-- Strict CSP: the README promises Electron needs no style-src 'unsafe-inline'. -->
     <meta
       http-equiv="Content-Security-Policy"
-      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'"
+      content="default-src 'self'; script-src 'self'; style-src 'self'"
     />
     <title>Electron renderer</title>
     <link

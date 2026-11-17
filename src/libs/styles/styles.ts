@@ -1,3 +1,6 @@
+import type { ShadowStyles } from '@types';
+import { h } from '@utils';
+
 /** Dark palette, shared by `theme="dark"` and `theme="auto"` (when the OS is dark). */
 const DARK_TOKENS = /* css */ `
   --tg-popover-bg: #0f172a;
@@ -326,31 +329,58 @@ function supportsAdoptedStyleSheets(): boolean {
   );
 }
 
-/**
- * Applies the base styles (shared constructable stylesheet when supported, `<style>` fallback
- * for older WebViews) plus optional per-instance custom CSS.
- */
-export function applyStyles(shadow: ShadowRoot, extraCss = ''): HTMLStyleElement {
-  const custom = document.createElement('style');
-  custom.setAttribute('data-tg-custom', '');
-  custom.textContent = extraCss;
+/** Adds a sheet after the shadow root's current ones, so its rules win. */
+function adopt(shadow: ShadowRoot, sheet: CSSStyleSheet): void {
+  // eslint-disable-next-line no-param-reassign -- adopting sheets is done by assignment
+  shadow.adoptedStyleSheets = [...shadow.adoptedStyleSheets, sheet];
+}
 
-  if (supportsAdoptedStyleSheets()) {
-    try {
-      sharedSheet ??= new CSSStyleSheet();
-      // CSSStyleSheet#replaceSync is a DOM API, not a blocking Node call.
-      // eslint-disable-next-line n/no-sync
-      if (sharedSheet.cssRules.length === 0) sharedSheet.replaceSync(TOUR_STYLES);
-      // eslint-disable-next-line no-param-reassign -- adopting sheets is done by assignment
-      shadow.adoptedStyleSheets = [...shadow.adoptedStyleSheets, sharedSheet];
-      shadow.append(custom);
-      return custom;
-    } catch {
-      // fall through to <style>
-    }
+/** Adopts the shared base sheet. `false` when constructable stylesheets are unavailable. */
+function adoptBase(shadow: ShadowRoot): boolean {
+  if (!supportsAdoptedStyleSheets()) return false;
+  try {
+    sharedSheet ??= new CSSStyleSheet();
+    // CSSStyleSheet#replaceSync is a DOM API, not a blocking Node call.
+    // eslint-disable-next-line n/no-sync
+    if (sharedSheet.cssRules.length === 0) sharedSheet.replaceSync(TOUR_STYLES);
+    adopt(shadow, sharedSheet);
+    return true;
+  } catch {
+    return false;
   }
-  const base = document.createElement('style');
-  base.textContent = TOUR_STYLES;
-  shadow.append(base, custom);
-  return custom;
+}
+
+/**
+ * Applies the base styles plus optional per-instance custom CSS (the `styles` option).
+ *
+ * With constructable stylesheets both go through `adoptedStyleSheets`, so a strict
+ * `style-src` (no `'unsafe-inline'`) reports nothing. Older WebViews fall back to `<style>`
+ * elements. Custom CSS is created lazily: no sheet or element exists until there is CSS.
+ */
+export function applyStyles(shadow: ShadowRoot, extraCss = ''): ShadowStyles {
+  const adopted = adoptBase(shadow);
+  if (!adopted) shadow.append(h('style', {}, [TOUR_STYLES]));
+
+  let current = '';
+  let sheet: CSSStyleSheet | undefined;
+  let element: HTMLStyleElement | undefined;
+
+  const setCustom = (css: string) => {
+    if (css === current) return;
+    current = css;
+    if (adopted) {
+      if (!sheet) {
+        sheet = new CSSStyleSheet();
+        adopt(shadow, sheet);
+      }
+      // eslint-disable-next-line n/no-sync -- DOM API, see adoptBase()
+      sheet.replaceSync(css);
+    } else {
+      element ??= shadow.appendChild(h('style', { 'data-tg-custom': true }));
+      element.textContent = css;
+    }
+  };
+
+  setCustom(extraCss);
+  return { setCustom };
 }

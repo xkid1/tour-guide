@@ -77,5 +77,6 @@ describe('Electron renderer', () => {
     await window.locator(popover).waitFor({ state: 'hidden' });
     assert.equal(await window.evaluate(() => document.activeElement?.id), 'opener');
     assert.deepEqual(errors, []);
+    assert.deepEqual(await window.evaluate(() => window.__violations), []);
   });
 });
